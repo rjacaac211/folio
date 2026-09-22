@@ -1,0 +1,107 @@
+// Folio data model.
+//
+// Four tables: users, documents, shares, attachments.
+// A document has exactly one owner; access for anyone else is granted through
+// a Share row carrying a role. lib/authz.ts is the only place these rules are
+// interpreted.
+
+generator client {
+  provider = "prisma-client"
+  output   = "../lib/generated/prisma"
+}
+
+// Connection URLs live in prisma.config.ts (Prisma 7 moved them out of the schema).
+datasource db {
+  provider = "postgresql"
+}
+
+/// Access a non-owner has been granted on a document.
+enum Role {
+  VIEWER
+  EDITOR
+}
+
+model User {
+  id    String @id @default(cuid())
+  email String @unique
+  name  String
+
+  /// Tailwind-friendly hue used for the avatar fallback, so users are
+  /// visually distinguishable without storing images.
+  avatarColor String
+
+  documents   Document[]
+  shares      Share[]
+  attachments Attachment[]
+  createdAt   DateTime     @default(now())
+
+  @@map("users")
+}
+
+model Document {
+  id    String @id @default(cuid())
+  title String
+
+  /// TipTap/ProseMirror document JSON. Stored as jsonb so structure and
+  /// formatting survive a round trip unchanged.
+  content Json
+
+  /// Incremented on every content write. Clients send the version they loaded;
+  /// a mismatch is rejected with 409 rather than silently overwriting.
+  version Int @default(1)
+
+  ownerId String
+  owner   User   @relation(fields: [ownerId], references: [id], onDelete: Cascade)
+
+  shares      Share[]
+  attachments Attachment[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([ownerId])
+  @@index([updatedAt])
+  @@map("documents")
+}
+
+model Share {
+  documentId String
+  document   Document @relation(fields: [documentId], references: [id], onDelete: Cascade)
+
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  role      Role     @default(VIEWER)
+  createdAt DateTime @default(now())
+
+  // Composite key: a user has at most one role per document, enforced by the
+  // database rather than by application code.
+  @@id([documentId, userId])
+  @@index([userId])
+  @@map("shares")
+}
+
+model Attachment {
+  id String @id @default(cuid())
+
+  documentId String
+  document   Document @relation(fields: [documentId], references: [id], onDelete: Cascade)
+
+  filename String
+  mimeType String
+  size     Int
+
+  /// Public URL served by blob storage.
+  url String
+
+  /// Storage key, retained so the blob can be deleted alongside the row.
+  pathname String
+
+  uploadedById String
+  uploadedBy   User   @relation(fields: [uploadedById], references: [id])
+
+  createdAt DateTime @default(now())
+
+  @@index([documentId])
+  @@map("attachments")
+}
