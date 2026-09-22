@@ -1,0 +1,24 @@
+# Local Postgres for development.
+#   docker compose up -d
+# Port 5433 is used so this never collides with a Postgres already on 5432.
+services:
+  postgres:
+    image: postgres:17-alpine
+    container_name: folio-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: folio
+      POSTGRES_PASSWORD: folio
+      POSTGRES_DB: folio
+    ports:
+      - "5433:5432"
+    volumes:
+      - folio-pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U folio -d folio"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+volumes:
+  folio-pgdata:
