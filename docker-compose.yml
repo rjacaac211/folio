@@ -1,6 +1,10 @@
 # Local Postgres for development.
 #   docker compose up -d
 # Port 5433 is used so this never collides with a Postgres already on 5432.
+# Explicit project name so container and volume names do not depend on the
+# directory this repository happens to be cloned into.
+name: folio
+
 services:
   postgres:
     image: postgres:17-alpine
