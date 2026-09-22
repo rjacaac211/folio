@@ -2,6 +2,7 @@ import { FileText, Users } from "lucide-react";
 import { requireUser } from "@/lib/auth/current-user";
 import { listOwnedDocuments, listSharedDocuments } from "@/lib/documents/queries";
 import { DocumentCard } from "@/components/document-card";
+import { NewDocumentButton } from "@/components/new-document-button";
 import type { DocumentSummary } from "@/lib/documents/queries";
 
 export const metadata = { title: "Documents — Folio" };
@@ -18,7 +19,10 @@ export default async function DocumentsPage() {
 
   return (
     <main className="mx-auto w-full max-w-6xl flex-1 px-4 py-8">
-      <h1 className="font-heading text-2xl font-semibold tracking-tight">Documents</h1>
+      <div className="flex items-center justify-between gap-4">
+        <h1 className="font-heading text-2xl font-semibold tracking-tight">Documents</h1>
+        <NewDocumentButton />
+      </div>
 
       <Section
         title="My documents"

@@ -54,3 +54,4 @@ next-env.d.ts
 
 # browser automation artifacts
 /.playwright-mcp
+
