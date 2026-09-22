@@ -51,3 +51,6 @@ next-env.d.ts
 /.windsurf
 /.claude/skills
 /skills-lock.json
+
+# browser automation artifacts
+/.playwright-mcp
