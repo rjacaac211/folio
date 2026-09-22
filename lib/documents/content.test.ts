@@ -5,6 +5,7 @@ import {
   documentToPlainText,
   isDocumentContent,
   MAX_CONTENT_DEPTH,
+  summarizeText,
   type DocumentContent,
 } from "./content";
 
@@ -116,12 +117,32 @@ describe("documentToPlainText", () => {
   });
 });
 
-describe("documentExcerpt", () => {
-  it("collapses to a single line", () => {
-    expect(documentExcerpt(sample, 40)).toBe("Q3 Planning We shipped three things this…");
+describe("summarizeText", () => {
+  it("collapses whitespace onto one line", () => {
+    expect(summarizeText("  a \n\n b   c ")).toBe("a b c");
   });
 
-  it("leaves short content unchanged and unsuffixed", () => {
+  it("truncates on a word boundary rather than mid-word", () => {
+    const result = summarizeText("alpha beta gamma delta epsilon", 20);
+    expect(result).toBe("alpha beta gamma…");
+    expect(result).not.toContain("delt…");
+  });
+
+  it("cuts mid-word when a word boundary would lose too much", () => {
+    expect(summarizeText("a supercalifragilisticexpialidocious", 12)).toBe("a supercalif…");
+  });
+
+  it("leaves short text unchanged and unsuffixed", () => {
+    expect(summarizeText("short enough")).toBe("short enough");
+  });
+});
+
+describe("documentExcerpt", () => {
+  it("flattens a document to a single line", () => {
+    expect(documentExcerpt(sample, 40)).toBe("Q3 Planning We shipped three things…");
+  });
+
+  it("leaves short content unsuffixed", () => {
     expect(documentExcerpt(sample)).not.toContain("…");
   });
 });

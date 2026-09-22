@@ -5,6 +5,6 @@ export default defineConfig({
   resolve: { tsconfigPaths: true },
   test: {
     environment: "node",
-    include: ["{app,lib}/**/*.test.ts"],
+    include: ["{app,components,lib}/**/*.test.ts"],
   },
 });

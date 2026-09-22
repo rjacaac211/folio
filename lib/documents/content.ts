@@ -110,9 +110,16 @@ export function documentToPlainText(content: DocumentContent): string {
     .trim();
 }
 
+/** Collapses whitespace and truncates on a whole word, adding an ellipsis. */
+export function summarizeText(text: string, maxLength = 160): string {
+  const collapsed = text.replace(/\s+/g, " ").trim();
+  if (collapsed.length <= maxLength) return collapsed;
+  const clipped = collapsed.slice(0, maxLength);
+  const lastSpace = clipped.lastIndexOf(" ");
+  return (lastSpace > maxLength * 0.6 ? clipped.slice(0, lastSpace) : clipped).trimEnd() + "…";
+}
+
 /** Single-line preview for document cards. */
 export function documentExcerpt(content: DocumentContent, maxLength = 160): string {
-  const text = documentToPlainText(content).replace(/\s+/g, " ").trim();
-  if (text.length <= maxLength) return text;
-  return text.slice(0, maxLength).trimEnd() + "…";
+  return summarizeText(documentToPlainText(content), maxLength);
 }
