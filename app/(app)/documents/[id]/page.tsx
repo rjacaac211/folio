@@ -54,6 +54,9 @@ export default async function DocumentPage({ params }: PageProps<"/documents/[id
         createdAt: attachment.createdAt.toISOString(),
       }))}
       storageEnabled={isStorageConfigured()}
+      owner={document.owner}
+      shares={document.shares.map((share) => ({ role: share.role, user: share.user }))}
+      canManageSharing={can(role, "share")}
     />
   );
 }

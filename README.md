@@ -101,6 +101,28 @@ lib/          Domain logic, utilities, and their colocated tests
 prisma/       Schema, migrations, and the demo-data seed
 ```
 
+## Sharing
+
+Every document has one **owner**. Anyone else reaches it through a share carrying a role:
+
+| Role       | Read | Edit | Manage sharing | Delete |
+| ---------- | ---- | ---- | -------------- | ------ |
+| **Owner**  | ✅    | ✅    | ✅              | ✅      |
+| **Editor** | ✅    | ✅    | ❌              | ❌      |
+| **Viewer** | ✅    | ❌    | ❌              | ❌      |
+
+Open a document and press **Share** to grant access by email, change someone's role, or remove
+them. Only the owner sees those controls — an editor can change a document's contents but not who
+else can reach it.
+
+Rules are enforced on the server for every request, not just hidden in the interface. Two details
+worth knowing:
+
+- Someone with **no** access gets **404**, not 403, so the API cannot be used to discover which
+  document IDs exist. Someone who can already see the document gets an honest 403.
+- **Revoking is immediate.** Access is resolved from the share rows on every request, so removing
+  a share closes the document, its attachments and its exports at the same moment.
+
 ## Importing and exporting
 
 **Import** turns a file into a new document, from the dashboard or `File → Import file…`.

@@ -13,6 +13,7 @@ import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { IMPORT_ACCEPT_ATTRIBUTE } from "@/lib/documents/convert/formats";
 import { AttachmentPanel, type Attachment } from "@/components/attachments/attachment-panel";
+import { ShareDialog, type Person, type Share } from "@/components/share/share-dialog";
 import { editorExtensions } from "./extensions";
 import { MenuBar, type ViewOptions } from "./menu-bar";
 import { SaveStatus } from "./save-status";
@@ -34,12 +35,18 @@ export function DocumentEditor({
   canEdit,
   attachments,
   storageEnabled,
+  owner,
+  shares,
+  canManageSharing,
 }: {
   document: EditorDocument;
   role: keyof typeof ROLE_LABEL;
   canEdit: boolean;
   attachments: Attachment[];
   storageEnabled: boolean;
+  owner: Person;
+  shares: Share[];
+  canManageSharing: boolean;
 }) {
   const router = useRouter();
   const [title, setTitle] = useState(initial.title);
@@ -169,6 +176,15 @@ export function DocumentEditor({
                   {ROLE_LABEL[role]}
                 </Badge>
                 <SaveStatus state={state} readOnly={!canEdit} />
+                <div className="ml-auto">
+                  <ShareDialog
+                    documentId={initial.id}
+                    documentTitle={title}
+                    owner={owner}
+                    initialShares={shares}
+                    canManage={canManageSharing}
+                  />
+                </div>
               </div>
 
               <MenuBar
