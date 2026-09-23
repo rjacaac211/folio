@@ -1,0 +1,16 @@
+Folio — walkthrough video
+=========================
+
+Video URL: <paste the unlisted Loom or YouTube link here>
+
+Length: 3-5 minutes
+
+Covers:
+  - the main user flow, on the live deployment
+  - what works end to end
+  - what was intentionally deprioritized, and why
+  - key implementation decisions
+  - how AI supported the work
+
+Live app: https://folio-omega-cyan.vercel.app
+Source:   https://github.com/rjacaac211/folio
