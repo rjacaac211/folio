@@ -1,6 +1,26 @@
 # Folio
 
-A lightweight collaborative document editor — create, format, import, share.
+A lightweight collaborative document editor — create, format, import, attach, share.
+
+**Live app: <https://folio-omega-cyan.vercel.app>** — no credentials needed; sign-in is a picker
+of demo accounts.
+
+![The editor](docs/screenshots/03-editor.png)
+
+## What it does
+
+- **Documents** — create, rename, edit, autosave, reopen. Formatting survives a refresh.
+- **Rich text** — bold, italic, underline, strikethrough, headings, bulleted and numbered lists,
+  quotes, undo/redo.
+- **Concurrent editing** — a save from a stale version is rejected rather than silently
+  overwriting someone else's work.
+- **Import** — `.docx`, `.md` and `.txt` become new documents with their formatting.
+- **Export** — Markdown, plain text, or print-to-PDF.
+- **Attachments** — stored privately; every download re-runs the document's access check.
+- **Sharing** — grant access by email as Viewer or Editor, change roles, revoke.
+
+Further reading: [ARCHITECTURE.md](ARCHITECTURE.md) for the design decisions and what was left
+out, [AI_WORKFLOW.md](AI_WORKFLOW.md) for how AI was used and how the result was verified.
 
 ## Stack
 
@@ -95,11 +115,19 @@ The app is served at <http://localhost:3000>.
 ## Project structure
 
 ```
-app/          Next.js routes (App Router)
+app/          Next.js routes (App Router) and API route handlers
 components/   React components; components/ui holds shadcn/ui primitives
 lib/          Domain logic, utilities, and their colocated tests
+  authz/        the permission model — start here
+  documents/    content shape, validation, conversion
+  attachments/  limits, validation, blob storage
+  sharing/      share request rules
 prisma/       Schema, migrations, and the demo-data seed
+docs/         Screenshots of the live deployment
 ```
+
+`lib/authz/policy.ts` is the most load-bearing file in the project: every document read and write
+passes through it. [ARCHITECTURE.md](ARCHITECTURE.md) explains why that shape was chosen.
 
 ## Sharing
 
@@ -152,6 +180,17 @@ can carry scripts.
 
 Attachments need `BLOB_READ_WRITE_TOKEN`. Without it the rest of the app runs normally and the
 upload control explains that storage is unconfigured, so local setup is never blocked by it.
+
+## Screenshots
+
+| | |
+| --- | --- |
+| ![Sign in](docs/screenshots/01-sign-in.png) | ![Dashboard](docs/screenshots/02-dashboard.png) |
+| Demo account picker | Owned and shared documents |
+| ![Share dialog](docs/screenshots/05-share-dialog.png) | ![Edit conflict](docs/screenshots/06-edit-conflict.png) |
+| Granting and changing access | A stale save rejected, not silently overwritten |
+| ![File menu](docs/screenshots/04-file-menu.png) | ![Read-only](docs/screenshots/07-viewer-read-only.png) |
+| Every menu item does something | A viewer gets a genuinely read-only editor |
 
 ## Demo accounts
 
