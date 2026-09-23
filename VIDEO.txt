@@ -1,16 +1,20 @@
 Folio — walkthrough video
 =========================
 
-Video URL: <paste the unlisted Loom or YouTube link here>
+No walkthrough video was recorded for this submission.
 
-Length: 3-5 minutes
+I ran out of time before the deadline and chose to submit the working product
+rather than delay it. The live deployment is fully testable using the seeded
+demo accounts listed in README.md, and everything a walkthrough would have
+covered is written up:
 
-Covers:
-  - the main user flow, on the live deployment
-  - what works end to end
-  - what was intentionally deprioritized, and why
-  - key implementation decisions
-  - how AI supported the work
+  README.md          what it does, how to run it, demo accounts
+  ARCHITECTURE.md    design decisions, and what was deliberately left out
+  AI_WORKFLOW.md     how AI was used, and how the result was verified
+  SUBMISSION.md      what works, what is incomplete, what comes next
+  docs/screenshots/  seven screenshots of the live deployment
+
+Happy to record one if it would be useful.
 
 Live app: https://folio-omega-cyan.vercel.app
 Source:   https://github.com/rjacaac211/folio
