@@ -12,10 +12,24 @@ export function normalizeTitle(raw: string): string {
 }
 
 /**
+ * Strips any directory prefix a browser included with an upload. Both separators
+ * are handled because a file picked on Windows can arrive with backslashes.
+ */
+export function basename(path: string): string {
+  return path.split(/[/\\]/).pop() ?? "";
+}
+
+/** The lowercased extension of a filename, without the dot, or "". */
+export function extensionOf(filename: string): string {
+  const base = basename(filename);
+  const dot = base.lastIndexOf(".");
+  return dot === -1 ? "" : base.slice(dot + 1).toLowerCase();
+}
+
+/**
  * Turn an uploaded filename into a document title: drop any directory prefix
  * the browser included, drop the extension, then normalize.
  */
 export function deriveTitleFromFilename(filename: string): string {
-  const base = filename.split(/[/\\]/).pop() ?? "";
-  return normalizeTitle(base.replace(/\.[^.]+$/, ""));
+  return normalizeTitle(basename(filename).replace(/\.[^.]+$/, ""));
 }

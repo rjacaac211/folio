@@ -101,6 +101,22 @@ lib/          Domain logic, utilities, and their colocated tests
 prisma/       Schema, migrations, and the demo-data seed
 ```
 
+## Importing and exporting
+
+**Import** turns a file into a new document, from the dashboard or `File → Import file…`.
+
+| Accepted    | Notes                                                              |
+| ----------- | ------------------------------------------------------------------ |
+| `.docx`     | Headings, bold, italic and lists are preserved. Images are dropped. |
+| `.md`       | Parsed as Markdown, not stored as literal text.                     |
+| `.txt`      | One paragraph per line.                                             |
+
+Files must be **2 MB or smaller**. Type is checked against the file's actual bytes rather than
+its name, so a renamed binary is rejected.
+
+**Export** is under `File`: Markdown, plain text, or `Print / Save as PDF`, which uses the
+browser's own print dialog with a print stylesheet.
+
 ## Demo accounts
 
 Seeded by `pnpm db:seed`. Sign-in is a picker, so no passwords are needed.
