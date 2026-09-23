@@ -12,6 +12,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { IMPORT_ACCEPT_ATTRIBUTE } from "@/lib/documents/convert/formats";
+import { AttachmentPanel, type Attachment } from "@/components/attachments/attachment-panel";
 import { editorExtensions } from "./extensions";
 import { MenuBar, type ViewOptions } from "./menu-bar";
 import { SaveStatus } from "./save-status";
@@ -31,10 +32,14 @@ export function DocumentEditor({
   document: initial,
   role,
   canEdit,
+  attachments,
+  storageEnabled,
 }: {
   document: EditorDocument;
   role: keyof typeof ROLE_LABEL;
   canEdit: boolean;
+  attachments: Attachment[];
+  storageEnabled: boolean;
 }) {
   const router = useRouter();
   const [title, setTitle] = useState(initial.title);
@@ -217,6 +222,13 @@ export function DocumentEditor({
             {words} {words === 1 ? "word" : "words"}
           </p>
         ) : null}
+
+        <AttachmentPanel
+          documentId={initial.id}
+          initialAttachments={attachments}
+          canEdit={canEdit}
+          storageEnabled={storageEnabled}
+        />
       </div>
     </div>
   );
