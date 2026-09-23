@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { FileText } from "lucide-react";
+import { FileText, Users } from "lucide-react";
 import type { DocumentSummary } from "@/lib/documents/queries";
 import { Badge } from "@/components/ui/badge";
 import { UserAvatar } from "@/components/user-avatar";
@@ -32,6 +32,15 @@ export function DocumentCard({ document }: { document: DocumentSummary }) {
         <span className="truncate">{document.owner.name}</span>
         <span aria-hidden>·</span>
         <span className="shrink-0">{formatRelativeTime(document.updatedAt)}</span>
+        {document.shareCount > 0 ? (
+          <span
+            className="ml-auto flex shrink-0 items-center gap-1"
+            title={`Shared with ${document.shareCount} ${document.shareCount === 1 ? "person" : "people"}`}
+          >
+            <Users className="size-3" />
+            {document.shareCount}
+          </span>
+        ) : null}
       </div>
     </Link>
   );
