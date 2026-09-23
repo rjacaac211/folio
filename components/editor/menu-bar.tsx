@@ -29,14 +29,18 @@ export type ViewOptions = {
  */
 export function MenuBar({
   editor,
+  documentId,
   canEdit,
   onRename,
+  onImport,
   view,
   onViewChange,
 }: {
   editor: Editor;
+  documentId: string;
   canEdit: boolean;
   onRename: () => void;
+  onImport: () => void;
   view: ViewOptions;
   onViewChange: (next: ViewOptions) => void;
 }) {
@@ -57,6 +61,16 @@ export function MenuBar({
     }
   }
 
+  // The export route sets content-disposition, so a link click hands the file
+  // straight to the browser's downloader. This is deliberately not a router
+  // navigation: the response is an attachment, not a page to render.
+  const download = (format: "md" | "txt") => {
+    const link = window.document.createElement("a");
+    link.href = `/api/documents/${documentId}/export?format=${format}`;
+    link.download = "";
+    link.click();
+  };
+
   const run = (fn: (chain: ReturnType<Editor["chain"]>) => void) => () => {
     const chain = editor.chain().focus();
     fn(chain);
@@ -72,6 +86,13 @@ export function MenuBar({
           </MenubarItem>
           <MenubarItem onSelect={onRename} disabled={!canEdit}>
             Rename…
+          </MenubarItem>
+          <MenubarItem onSelect={onImport}>Import file…</MenubarItem>
+          <MenubarSeparator />
+          <MenubarItem onSelect={() => download("md")}>Download as Markdown</MenubarItem>
+          <MenubarItem onSelect={() => download("txt")}>Download as plain text</MenubarItem>
+          <MenubarItem onSelect={() => window.print()}>
+            Print / Save as PDF <MenubarShortcut>Ctrl+P</MenubarShortcut>
           </MenubarItem>
           <MenubarSeparator />
           <MenubarItem onSelect={() => router.push("/documents")}>

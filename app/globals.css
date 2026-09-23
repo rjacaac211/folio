@@ -243,3 +243,67 @@
   height: 0;
   pointer-events: none;
 }
+
+/*
+ * Print / Save as PDF.
+ *
+ * The browser's own print-to-PDF is used rather than a server-side renderer:
+ * it needs no extra dependency, honours the reader's paper size, and prints
+ * exactly the type they are looking at. Everything that is interface rather
+ * than document is hidden, and the page itself loses its screen framing so the
+ * text sits on the paper margins instead of inside a floating card.
+ */
+@media print {
+  [data-print-hidden],
+  header,
+  nav,
+  [data-sonner-toaster] {
+    display: none !important;
+  }
+
+  html,
+  body {
+    background: #fff !important;
+  }
+
+  .folio-page {
+    max-width: none !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    border: none !important;
+    border-radius: 0 !important;
+    box-shadow: none !important;
+    background: #fff !important;
+  }
+
+  .folio-prose .ProseMirror {
+    color: #000;
+    font-size: 11pt;
+    line-height: 1.5;
+  }
+
+  /* Keep headings with the text that follows them. */
+  .folio-prose .ProseMirror h1,
+  .folio-prose .ProseMirror h2,
+  .folio-prose .ProseMirror h3 {
+    break-after: avoid;
+    page-break-after: avoid;
+  }
+
+  .folio-prose .ProseMirror li,
+  .folio-prose .ProseMirror blockquote {
+    break-inside: avoid;
+    page-break-inside: avoid;
+  }
+
+  /* Print link targets, which are otherwise lost on paper. */
+  .folio-prose .ProseMirror a::after {
+    content: " (" attr(href) ")";
+    font-size: 0.85em;
+    color: #444;
+  }
+
+  @page {
+    margin: 2cm;
+  }
+}

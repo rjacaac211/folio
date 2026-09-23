@@ -3,7 +3,7 @@
 import { EditorContent, useEditor } from "@tiptap/react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { ArrowLeft, RefreshCw } from "lucide-react";
 import { toast } from "sonner";
 import type { DocumentContent } from "@/lib/documents/content";
@@ -11,6 +11,7 @@ import { documentToPlainText } from "@/lib/documents/content";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
+import { IMPORT_ACCEPT_ATTRIBUTE } from "@/lib/documents/convert/formats";
 import { editorExtensions } from "./extensions";
 import { MenuBar, type ViewOptions } from "./menu-bar";
 import { SaveStatus } from "./save-status";
@@ -39,6 +40,7 @@ export function DocumentEditor({
   const [title, setTitle] = useState(initial.title);
   const [view, setView] = useState<ViewOptions>({ fullWidth: false, showWordCount: false });
   const { state, save } = useDocumentSave(initial.id, initial.version);
+  const importInput = useRef<HTMLInputElement>(null);
 
   const editor = useEditor({
     extensions: editorExtensions,
@@ -99,9 +101,41 @@ export function DocumentEditor({
         .filter(Boolean).length
     : 0;
 
+  async function importFileAsDocument(file: File) {
+    const body = new FormData();
+    body.append("file", file);
+    try {
+      const response = await fetch("/api/documents/import", { method: "POST", body });
+      const payload = (await response.json().catch(() => null)) as {
+        id?: string;
+        title?: string;
+        error?: string;
+      } | null;
+      if (!response.ok || !payload?.id) {
+        toast.error(payload?.error ?? "That file could not be imported.");
+        return;
+      }
+      toast.success(`Imported “${payload.title}”`);
+      router.push(`/documents/${payload.id}`);
+    } catch {
+      toast.error("Could not reach the server. Please try again.");
+    }
+  }
+
   return (
     <div className="flex flex-1 flex-col">
-      <div className="bg-background sticky top-14 z-20 border-b">
+      <input
+        ref={importInput}
+        type="file"
+        accept={IMPORT_ACCEPT_ATTRIBUTE}
+        className="hidden"
+        onChange={(event) => {
+          const file = event.target.files?.[0];
+          event.target.value = "";
+          if (file) void importFileAsDocument(file);
+        }}
+      />
+      <div data-print-hidden className="bg-background sticky top-14 z-20 border-b">
         <div className="mx-auto w-full max-w-6xl px-4 py-2">
           <div className="flex items-center gap-3">
             <Link
@@ -134,8 +168,10 @@ export function DocumentEditor({
 
               <MenuBar
                 editor={editor}
+                documentId={initial.id}
                 canEdit={canEdit}
                 onRename={() => void renameDocument()}
+                onImport={() => importInput.current?.click()}
                 view={view}
                 onViewChange={setView}
               />
@@ -149,7 +185,10 @@ export function DocumentEditor({
       </div>
 
       {state.status === "conflict" ? (
-        <div className="border-b border-amber-300 bg-amber-50 dark:border-amber-900 dark:bg-amber-950/40">
+        <div
+          data-print-hidden
+          className="border-b border-amber-300 bg-amber-50 dark:border-amber-900 dark:bg-amber-950/40"
+        >
           <div className="mx-auto flex w-full max-w-6xl items-center gap-3 px-4 py-2.5 text-sm">
             <RefreshCw className="size-4 shrink-0 text-amber-600 dark:text-amber-500" />
             <p className="flex-1 text-amber-900 dark:text-amber-200">
@@ -166,7 +205,7 @@ export function DocumentEditor({
       <div className="bg-muted/40 flex-1 px-4 py-8">
         <div
           className={cn(
-            "bg-card mx-auto rounded-lg border p-10 shadow-sm md:p-16",
+            "folio-page bg-card mx-auto rounded-lg border p-10 shadow-sm md:p-16",
             view.fullWidth ? "max-w-6xl" : "max-w-3xl",
           )}
         >
@@ -174,7 +213,7 @@ export function DocumentEditor({
         </div>
 
         {view.showWordCount ? (
-          <p className="text-muted-foreground mt-3 text-center text-xs">
+          <p data-print-hidden className="text-muted-foreground mt-3 text-center text-xs">
             {words} {words === 1 ? "word" : "words"}
           </p>
         ) : null}
