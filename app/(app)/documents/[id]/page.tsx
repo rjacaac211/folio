@@ -3,6 +3,8 @@ import { requireUser } from "@/lib/auth/current-user";
 import { AccessDeniedError, can, requireDocumentAccess } from "@/lib/authz";
 import { createEmptyDocument, isDocumentContent } from "@/lib/documents/content";
 import { DocumentEditor } from "@/components/editor/document-editor";
+import { isStorageConfigured } from "@/lib/attachments/storage";
+import { prisma } from "@/lib/db";
 
 export const dynamic = "force-dynamic";
 
@@ -22,6 +24,19 @@ export default async function DocumentPage({ params }: PageProps<"/documents/[id
 
   const { document, role } = access;
 
+  const attachments = await prisma.attachment.findMany({
+    where: { documentId: document.id },
+    orderBy: { createdAt: "asc" },
+    select: {
+      id: true,
+      filename: true,
+      mimeType: true,
+      size: true,
+      createdAt: true,
+      uploadedBy: { select: { id: true, name: true } },
+    },
+  });
+
   return (
     <DocumentEditor
       document={{
@@ -34,6 +49,11 @@ export default async function DocumentPage({ params }: PageProps<"/documents/[id
       }}
       role={role}
       canEdit={can(role, "write")}
+      attachments={attachments.map((attachment) => ({
+        ...attachment,
+        createdAt: attachment.createdAt.toISOString(),
+      }))}
+      storageEnabled={isStorageConfigured()}
     />
   );
 }

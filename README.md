@@ -117,6 +117,20 @@ its name, so a renamed binary is rejected.
 **Export** is under `File`: Markdown, plain text, or `Print / Save as PDF`, which uses the
 browser's own print dialog with a print stylesheet.
 
+## Attachments
+
+Files can be attached to a document from the panel below the page. Attachments are stored
+**privately** and have no public URL: every download goes back through the app and re-runs the
+document's access check, so revoking someone's access closes the attachments with it.
+
+Accepted: images (PNG, JPEG, GIF, WebP), PDF, Office files (`.docx`, `.xlsx`, `.pptx`), `.txt`,
+`.md`, `.csv`, `.json` and `.zip` — up to **5 MB each**, **10 per document**. The list is an
+allowlist, so anything not named is refused; HTML and SVG are excluded deliberately because both
+can carry scripts.
+
+Attachments need `BLOB_READ_WRITE_TOKEN`. Without it the rest of the app runs normally and the
+upload control explains that storage is unconfigured, so local setup is never blocked by it.
+
 ## Demo accounts
 
 Seeded by `pnpm db:seed`. Sign-in is a picker, so no passwords are needed.
